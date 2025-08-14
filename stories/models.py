@@ -15,6 +15,26 @@ class Story(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def first_image(self):
+        """Get the first image associated with this story"""
+        return self.images.first()
+
+    @property
+    def combined_image(self):
+        """Get the combined image for this story"""
+        return self.images.filter(image_type='combined').first()
+
+    @property
+    def character_image(self):
+        """Get the character image for this story"""
+        return self.images.filter(image_type='character').first()
+
+    @property
+    def background_image(self):
+        """Get the background image for this story"""
+        return self.images.filter(image_type='background').first()
+
     class Meta:
         ordering = ['-created_at']
 

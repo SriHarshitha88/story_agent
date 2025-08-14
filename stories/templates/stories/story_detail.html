@@ -3,92 +3,193 @@
 {% block title %}{{ story.title }}{% endblock %}
 
 {% block content %}
+<!-- Back Navigation -->
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'stories:home' %}" class="text-decoration-none">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{% url 'stories:story_list' %}" class="text-decoration-none">
+                        <i class="fas fa-book me-1"></i>Stories
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">{{ story.title|truncatechars:30 }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-lg-8">
+        <!-- Story Header -->
+        <div class="card story-content mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h1 class="h3 mb-2">{{ story.title }}</h1>
+                        <div class="d-flex align-items-center text-muted">
+                            <i class="fas fa-clock me-2"></i>
+                            <span>Generated {{ story.created_at|timesince }} ago</span>
+                            <span class="ms-3">•</span>
+                            <i class="fas fa-book-open ms-3 me-2"></i>
+                            <span>{{ story.story_text|wordcount }} words</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Original Prompt -->
+        <div class="card story-meta mb-4">
+            <div class="card-body">
+                <h5 class="d-flex align-items-center mb-3">
+                    <i class="fas fa-lightbulb text-primary me-2"></i>
+                    Original Prompt
+                </h5>
+                <blockquote class="blockquote mb-0">
+                    <p class="fst-italic">"{{ story.prompt }}"</p>
+                </blockquote>
+            </div>
+        </div>
+
         <!-- Story Content -->
-        <div class="card mb-4">
-            <div class="card-header bg-transparent">
-                <h3 class="card-title mb-0">{{ story.title }}</h3>
-                <small class="text-muted">Generated {{ story.created_at|timesince }} ago</small>
+        <div class="card story-content mb-4">
+            <div class="card-header">
+                <h5 class="d-flex align-items-center mb-0">
+                    <i class="fas fa-feather-alt text-primary me-2"></i>
+                    Generated Story
+                </h5>
             </div>
             <div class="card-body">
-                <div class="mb-3">
-                    <h6 class="fw-bold text-primary">Original Prompt:</h6>
-                    <p class="fst-italic">{{ story.prompt }}</p>
-                </div>
-                
-                <div>
-                    <h6 class="fw-bold text-primary">Generated Story:</h6>
-                    <div class="story-text">
-                        {{ story.story_text|linebreaks }}
-                    </div>
+                <div class="story-text fs-6">
+                    {{ story.story_text|linebreaks }}
                 </div>
             </div>
         </div>
 
         <!-- Generated Descriptions -->
-        <div class="card mb-4">
-            <div class="card-header bg-transparent">
-                <h5 class="card-title mb-0">AI-Generated Descriptions</h5>
+        {% if story.character_description or story.background_description %}
+        <div class="card story-content mb-4">
+            <div class="card-header">
+                <h5 class="d-flex align-items-center mb-0">
+                    <i class="fas fa-paint-brush text-primary me-2"></i>
+                    AI-Generated Visual Descriptions
+                </h5>
             </div>
             <div class="card-body">
-                <div class="row">
+                <div class="row g-4">
+                    {% if story.character_description %}
                     <div class="col-md-6">
-                        <h6 class="fw-bold text-success">Character Description:</h6>
-                        <p class="small">{{ story.character_description }}</p>
+                        <div class="description-card">
+                            <h6 class="d-flex align-items-center text-success mb-3">
+                                <i class="fas fa-user me-2"></i>
+                                Character Description
+                            </h6>
+                            <p class="text-muted">{{ story.character_description }}</p>
+                        </div>
                     </div>
+                    {% endif %}
+                    {% if story.background_description %}
                     <div class="col-md-6">
-                        <h6 class="fw-bold text-info">Background Description:</h6>
-                        <p class="small">{{ story.background_description }}</p>
+                        <div class="description-card">
+                            <h6 class="d-flex align-items-center text-info mb-3">
+                                <i class="fas fa-mountain me-2"></i>
+                                Background Description
+                            </h6>
+                            <p class="text-muted">{{ story.background_description }}</p>
+                        </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
+        {% endif %}
     </div>
 
     <div class="col-lg-4">
         <!-- Generated Images -->
-        <div class="card">
-            <div class="card-header bg-transparent">
-                <h5 class="card-title mb-0">🎨 Generated Images</h5>
+        <div class="card story-image-container sticky-top">
+            <div class="card-header">
+                <h5 class="d-flex align-items-center mb-0">
+                    <i class="fas fa-images text-primary me-2"></i>
+                    Generated Artwork
+                </h5>
             </div>
             <div class="card-body">
                 {% if images %}
                     {% for image in images %}
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-capitalize">
-                            {% if image.image_type == 'character' %}
-                                🧙‍♂️ Character
-                            {% elif image.image_type == 'background' %}
-                                🏞️ Background
-                            {% elif image.image_type == 'combined' %}
-                                🖼️ Combined Scene
-                            {% endif %}
-                        </h6>
-                        <img src="{{ image.image_file.url }}" alt="{{ image.image_type }} image" class="story-image mb-2">
-                        <p class="small text-muted">{{ image.prompt_used|truncatechars:100 }}</p>
+                    <div class="image-section mb-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="image-type-badge">
+                                {% if image.image_type == 'character' %}
+                                    <i class="fas fa-user text-success me-2"></i>
+                                    <span>Character</span>
+                                {% elif image.image_type == 'background' %}
+                                    <i class="fas fa-mountain text-info me-2"></i>
+                                    <span>Background</span>
+                                {% elif image.image_type == 'combined' %}
+                                    <i class="fas fa-layer-group text-warning me-2"></i>
+                                    <span>Combined Scene</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="image-container mb-3">
+                            <img src="{{ image.image_file.url }}" 
+                                 alt="{{ image.image_type }} image" 
+                                 class="story-image w-100 clickable-image"
+                                 data-bs-toggle="tooltip" 
+                                 data-bs-placement="top" 
+                                 title="Click to view full size">
+                            <div class="image-overlay">
+                                <i class="fas fa-search-plus fs-2"></i>
+                            </div>
+                        </div>
+                        
+                        {% if image.prompt_used %}
+                        <div class="image-prompt">
+                            <small class="text-muted">
+                                <i class="fas fa-quote-left me-1"></i>
+                                {{ image.prompt_used|truncatechars:80 }}
+                            </small>
+                        </div>
+                        {% endif %}
+                        
+                        {% if not forloop.last %}
+                        <hr class="my-4">
+                        {% endif %}
                     </div>
-                    {% if not forloop.last %}<hr>{% endif %}
                     {% endfor %}
                 {% else %}
-                    <div class="text-center text-muted">
-                        <p>No images generated for this story.</p>
-                        <small>Images might still be processing or generation failed.</small>
+                    <div class="text-center py-4">
+                        <i class="fas fa-image display-4 text-muted mb-3"></i>
+                        <h6 class="text-muted">No Images Available</h6>
+                        <p class="text-muted small mb-0">
+                            Images might still be processing or generation failed.
+                        </p>
                     </div>
                 {% endif %}
             </div>
         </div>
 
-        <!-- Actions -->
+        <!-- Action Buttons -->
         <div class="card mt-4">
-            <div class="card-body text-center">
-                <a href="{% url 'stories:home' %}" class="btn btn-primary mb-2">
-                    ✨ Generate Another Story
-                </a>
-                <br>
-                <a href="{% url 'stories:story_list' %}" class="btn btn-outline-secondary">
-                    📚 View All Stories
-                </a>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'stories:home' %}" class="btn btn-primary">
+                        <i class="fas fa-magic me-2"></i>
+                        Generate New Story
+                    </a>
+                    <a href="{% url 'stories:story_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-book me-2"></i>
+                        Browse All Stories
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -97,24 +198,40 @@
 
 {% block extra_js %}
 <script>
-// Add smooth scrolling and image modal functionality
 $(document).ready(function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
     // Add click event to images for larger view
-    $('.story-image').on('click', function() {
+    $('.clickable-image').on('click', function() {
         const imgSrc = $(this).attr('src');
         const imgAlt = $(this).attr('alt');
         
-        // Create modal
+        // Create enhanced modal
         const modal = $(`
             <div class="modal fade" id="imageModal" tabindex="-1">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">${imgAlt}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <h5 class="modal-title">
+                                <i class="fas fa-image me-2"></i>
+                                ${imgAlt}
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body text-center">
-                            <img src="${imgSrc}" class="img-fluid" alt="${imgAlt}">
+                        <div class="modal-body text-center p-0">
+                            <img src="${imgSrc}" class="img-fluid w-100" alt="${imgAlt}" style="max-height: 80vh; object-fit: contain;">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i>Close
+                            </button>
+                            <a href="${imgSrc}" download class="btn btn-primary">
+                                <i class="fas fa-download me-1"></i>Download
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -128,6 +245,26 @@ $(document).ready(function() {
         $('#imageModal').on('hidden.bs.modal', function() {
             $(this).remove();
         });
+    });
+
+    // Smooth scroll for anchor links
+    $('a[href^="#"]').on('click', function(e) {
+        e.preventDefault();
+        const target = $(this.getAttribute('href'));
+        if (target.length) {
+            $('html, body').animate({
+                scrollTop: target.offset().top - 100
+            }, 800);
+        }
+    });
+
+    // Add reading progress indicator
+    $(window).scroll(function() {
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        
+        // You can add a progress bar here if desired
     });
 });
 </script>

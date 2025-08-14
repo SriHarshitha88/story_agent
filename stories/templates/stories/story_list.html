@@ -3,79 +3,160 @@
 {% block title %}All Stories{% endblock %}
 
 {% block content %}
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display-6 fw-bold mb-2">
+                    <i class="fas fa-book text-primary me-3"></i>
+                    Story Agent Collection
+                </h1>
+                <p class="text-muted mb-0">Explore all your AI-generated stories and adventures</p>
+            </div>
+            <a href="{% url 'stories:home' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>
+                Create New Story
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Stories Grid -->
 <div class="row">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                <h3 class="card-title mb-0">📚 All Generated Stories</h3>
-                <a href="{% url 'stories:home' %}" class="btn btn-primary">
-                    ✨ Generate New Story
-                </a>
-            </div>
-            <div class="card-body">
-                {% if stories %}
-                    <div class="row">
-                        {% for story in stories %}
-                        <div class="col-lg-4 col-md-6 mb-4">
-                            <div class="card h-100 border-0 shadow-sm">
-                                {% with story.images.all|first as first_image %}
-                                    {% if first_image %}
-                                        <img src="{{ first_image.image_file.url }}" 
-                                             class="card-img-top story-image" 
-                                             alt="Story image"
-                                             style="height: 200px; object-fit: cover;">
-                                    {% else %}
-                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
-                                             style="height: 200px;">
-                                            <div class="text-muted text-center">
-                                                <i class="fas fa-image fa-3x mb-2"></i>
-                                                <p>No Image</p>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                {% endwith %}
-                                
-                                <div class="card-body d-flex flex-column">
-                                    <h5 class="card-title">{{ story.title|truncatechars:60 }}</h5>
-                                    <p class="card-text text-muted small flex-grow-1">
-                                        <strong>Prompt:</strong> {{ story.prompt|truncatechars:120 }}
-                                    </p>
-                                    <p class="card-text">
-                                        <small class="text-muted">
-                                            Generated {{ story.created_at|timesince }} ago
-                                        </small>
-                                    </p>
-                                    <div class="mt-auto">
-                                        <a href="{% url 'stories:story_detail' story.id %}" 
-                                           class="btn btn-outline-primary btn-sm">
-                                            Read Story
-                                        </a>
-                                        <span class="badge bg-secondary ms-2">
-                                            {{ story.images.count }} image{{ story.images.count|pluralize }}
-                                        </span>
+        {% if stories %}
+            <div class="row g-4">
+                {% for story in stories %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="card story-list-item h-100">
+                        <div class="story-preview-image">
+                            {% if story.combined_image %}
+                                <img src="{{ story.combined_image.image_file.url }}" 
+                                     class="card-img-top story-image" 
+                                     alt="Story image">
+                            {% elif story.first_image %}
+                                <img src="{{ story.first_image.image_file.url }}" 
+                                     class="card-img-top story-image" 
+                                     alt="Story image">
+                            {% else %}
+                                <div class="d-flex align-items-center justify-content-center h-100 bg-tertiary">
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-image fs-1 mb-3"></i>
+                                        <p class="mb-0">No Image</p>
                                     </div>
+                                </div>
+                            {% endif %}
+                            <div class="story-overlay">
+                                <div class="text-center">
+                                    <i class="fas fa-book-open fs-2 mb-2"></i>
+                                    <p class="mb-0">Read Story</p>
                                 </div>
                             </div>
                         </div>
-                        {% endfor %}
-                    </div>
-                    
-                    <!-- Pagination could go here if needed -->
-                    
-                {% else %}
-                    <div class="text-center py-5">
-                        <div class="mb-4">
-                            <i class="fas fa-book-open fa-5x text-muted"></i>
+                        
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title mb-3">{{ story.title|truncatechars:50 }}</h5>
+                            
+                            <div class="story-meta mb-3">
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-quote-left me-1"></i>
+                                    <strong>Prompt:</strong> {{ story.prompt|truncatechars:100 }}
+                                </p>
+                                <p class="text-muted small mb-0">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Generated {{ story.created_at|timesince }} ago
+                                </p>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{% url 'stories:story_detail' story.id %}" 
+                                       class="btn btn-primary btn-sm">
+                                        <i class="fas fa-book-open me-1"></i>
+                                        Read Story
+                                    </a>
+                                    {% if story.images.count > 0 %}
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-images me-1"></i>
+                                        {{ story.images.count }} image{{ story.images.count|pluralize }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
-                        <h4 class="text-muted">No Stories Generated Yet</h4>
-                        <p class="text-muted mb-4">Start creating amazing AI-generated stories with images!</p>
-                        <a href="{% url 'stories:home' %}" class="btn btn-primary btn-lg">
-                            ✨ Create Your First Story
-                        </a>
                     </div>
-                {% endif %}
+                </div>
+                {% endfor %}
             </div>
-        </div>
+            
+            <!-- Pagination Section -->
+            {% if is_paginated %}
+            <div class="row mt-5">
+                <div class="col-12">
+                    <nav aria-label="Story pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            {% endif %}
+            
+        {% else %}
+            <!-- Empty State -->
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-book-open display-1 text-muted"></i>
+                    </div>
+                    <h3 class="text-muted mb-3">No Stories Yet</h3>
+                    <p class="text-muted mb-4 lead">
+                        Your story collection is empty. Start creating amazing AI-generated stories with stunning visuals!
+                    </p>
+                    <a href="{% url 'stories:home' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-magic me-2"></i>
+                        Create Your First Story
+                    </a>
+                </div>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
