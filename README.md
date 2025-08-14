@@ -37,6 +37,10 @@ graph TD
     L --> M
     M --> N[Cosmic UI Display]
 ```
+## 🎬 Demo & Links
+
+### 📺 **Video Demo**
+[![Story Agent Demo](https://img.shields.io/badge/Watch-Demo_Video-red?logo=youtube&style=for-the-badge&logoColor=white)](YOUR_VIDEO_URL_HERE)
 
 ## 📋 Prerequisites
 
@@ -106,64 +110,6 @@ python manage.py runserver
    - Click "Generate Story & Images"
    - Watch the real-time progress
    - View your generated story with images!
-
-## 🎯 Evaluation Alignment: How This Project Excels
-
-### **🔧 Prompt Engineering**
-See `docs/prompt_engineering.md` for comprehensive template structure and rationale. Sample prompts and outputs demonstrate narrative diversity and novel context chaining techniques.
-
-**Key Features:**
-- Multi-stage prompt templates for story, character, and background generation
-- Context-aware prompt chaining between agents
-- Dynamic prompt adaptation based on narrative content
-- Template validation and error handling
-
-### **🔗 LangChain Orchestration**  
-Three main specialized agents (story, character, background) with clearly defined interfaces in `chains.py`. Sequential workflow with error-checked context passing ensures robust generation.
-
-**Architecture Highlights:**
-- **StoryGenerationAgent**: Primary narrative creation with plot structure
-- **CharacterDescriptionAgent**: Visual character prompt generation  
-- **BackgroundDescriptionAgent**: Environmental scene prompt creation
-- Seamless data flow between agents with validation checkpoints
-
-### **📖 Narrative Quality**  
-Generated stories and descriptions are showcased in `docs/examples.md`, demonstrating coherence, creativity, and thematic variability across different genres and styles.
-
-**Quality Metrics:**
-- Coherent plot structure with beginning, middle, and end
-- Character-driven narratives with emotional depth  
-- Creative variability across genres (fantasy, sci-fi, mystery, etc.)
-- Consistent tone and style throughout generated content
-
-### **🎨 Visual Integration**  
-Open-source models (Stable Diffusion, SDXL) generate character and background images, intelligently merged via PIL. Complete pipeline detailed under `image_generation/` documentation.
-
-**Visual Pipeline:**
-- High-quality character generation from textual descriptions
-- Environmental background creation with atmospheric consistency
-- Intelligent image merging with proper compositing
-- Support for multiple diffusion models and resolutions
-
-### **💻 Usability & Robustness**  
-Modern cosmic-themed UI with comprehensive error handling, logging, and user feedback. Screenshots and interaction flows included in documentation.
-
-**Robustness Features:**
-- Real-time progress tracking with visual feedback
-- Comprehensive error handling with user-friendly messages
-- Session management for long-running generations
-- Responsive design with mobile compatibility
-- Detailed logging for debugging and monitoring
-
-### **📚 Documentation**  
-Complete documentation including prompt templates, architectural decisions, model licenses, deployment guides, and API references.
-
-**Documentation Structure:**
-- `/docs/prompt_engineering.md` - Template design and rationale
-- `/docs/examples.md` - Generated content samples
-- `/docs/architecture.md` - System design decisions  
-- `/docs/deployment.md` - Production setup guide
-- `/image_generation/` - Visual pipeline documentation
 
 ## 📁 Project Structure
 
@@ -287,13 +233,6 @@ For production deployment:
 ## 📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🎬 Demo & Links
-
-### 📺 **Video Demo**
-[![Story Agent Demo](https://img.shields.io/badge/Watch-Demo_Video-red?logo=youtube&style=for-the-badge&logoColor=white)](YOUR_VIDEO_URL_HERE)
-
-*Replace `YOUR_VIDEO_URL_HERE` with your actual video URL*
 
 ### 🔗 **Repository**
 [![GitHub](https://img.shields.io/badge/View-Source_Code-blue?logo=github&style=for-the-badge&logoColor=white)](https://github.com/SriHarshitha88/story_agent.git)
