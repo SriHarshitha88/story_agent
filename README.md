@@ -40,7 +40,7 @@ graph TD
 ## 🎬 Demo & Links
 
 ### 📺 **Video Demo**
-[![Story Agent Demo](https://img.shields.io/badge/Watch-Demo_Video-red?logo=youtube&style=for-the-badge&logoColor=white)](YOUR_VIDEO_URL_HERE)
+[![Story Agent Demo](https://img.shields.io/badge/Watch-Demo_Video-red?logo=youtube&style=for-the-badge&logoColor=white)](https://github.com/user-attachments/assets/39d249a5-5a31-4934-9aa3-adaada0068f8)
 
 ## 📋 Prerequisites
 
