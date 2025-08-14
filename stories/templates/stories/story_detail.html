@@ -1,0 +1,134 @@
+{% extends 'stories/base.html' %}
+
+{% block title %}{{ story.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Story Content -->
+        <div class="card mb-4">
+            <div class="card-header bg-transparent">
+                <h3 class="card-title mb-0">{{ story.title }}</h3>
+                <small class="text-muted">Generated {{ story.created_at|timesince }} ago</small>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="fw-bold text-primary">Original Prompt:</h6>
+                    <p class="fst-italic">{{ story.prompt }}</p>
+                </div>
+                
+                <div>
+                    <h6 class="fw-bold text-primary">Generated Story:</h6>
+                    <div class="story-text">
+                        {{ story.story_text|linebreaks }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generated Descriptions -->
+        <div class="card mb-4">
+            <div class="card-header bg-transparent">
+                <h5 class="card-title mb-0">AI-Generated Descriptions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-success">Character Description:</h6>
+                        <p class="small">{{ story.character_description }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-info">Background Description:</h6>
+                        <p class="small">{{ story.background_description }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Generated Images -->
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h5 class="card-title mb-0">🎨 Generated Images</h5>
+            </div>
+            <div class="card-body">
+                {% if images %}
+                    {% for image in images %}
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-capitalize">
+                            {% if image.image_type == 'character' %}
+                                🧙‍♂️ Character
+                            {% elif image.image_type == 'background' %}
+                                🏞️ Background
+                            {% elif image.image_type == 'combined' %}
+                                🖼️ Combined Scene
+                            {% endif %}
+                        </h6>
+                        <img src="{{ image.image_file.url }}" alt="{{ image.image_type }} image" class="story-image mb-2">
+                        <p class="small text-muted">{{ image.prompt_used|truncatechars:100 }}</p>
+                    </div>
+                    {% if not forloop.last %}<hr>{% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted">
+                        <p>No images generated for this story.</p>
+                        <small>Images might still be processing or generation failed.</small>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card mt-4">
+            <div class="card-body text-center">
+                <a href="{% url 'stories:home' %}" class="btn btn-primary mb-2">
+                    ✨ Generate Another Story
+                </a>
+                <br>
+                <a href="{% url 'stories:story_list' %}" class="btn btn-outline-secondary">
+                    📚 View All Stories
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add smooth scrolling and image modal functionality
+$(document).ready(function() {
+    // Add click event to images for larger view
+    $('.story-image').on('click', function() {
+        const imgSrc = $(this).attr('src');
+        const imgAlt = $(this).attr('alt');
+        
+        // Create modal
+        const modal = $(`
+            <div class="modal fade" id="imageModal" tabindex="-1">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">${imgAlt}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="${imgSrc}" class="img-fluid" alt="${imgAlt}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+        
+        $('body').append(modal);
+        $('#imageModal').modal('show');
+        
+        // Remove modal when hidden
+        $('#imageModal').on('hidden.bs.modal', function() {
+            $(this).remove();
+        });
+    });
+});
+</script>
+{% endblock %}

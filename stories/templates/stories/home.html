@@ -1,0 +1,166 @@
+{% extends 'stories/base.html' %}
+
+{% block title %}Generate Your Story{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-transparent text-center">
+                <h2 class="card-title mb-0">🎭 AI Story Generator</h2>
+                <p class="text-muted">Create amazing stories with AI-generated images</p>
+            </div>
+            <div class="card-body">
+                <form id="storyForm">
+                    <div class="mb-4">
+                        <label for="prompt" class="form-label fw-bold">Story Prompt</label>
+                        <textarea 
+                            class="form-control" 
+                            id="prompt" 
+                            name="prompt" 
+                            rows="4" 
+                            placeholder="Describe the story you want to create... (e.g., 'A brave knight discovers a magical forest filled with talking animals')"
+                            required></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
+                            ✨ Generate Story & Images
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Progress Section (Initially Hidden) -->
+                <div id="progressSection" class="mt-4" style="display: none;">
+                    <h5>Generating Your Story...</h5>
+                    <div class="progress mb-3">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" 
+                             role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            0%
+                        </div>
+                    </div>
+                    <div id="statusText" class="text-muted">Initializing...</div>
+                </div>
+
+                <!-- Error Section -->
+                <div id="errorSection" class="alert alert-danger mt-4" style="display: none;">
+                    <h5>Error</h5>
+                    <div id="errorText"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Stories -->
+        {% if recent_stories %}
+        <div class="card mt-4">
+            <div class="card-header bg-transparent">
+                <h5 class="card-title mb-0">Recent Stories</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for story in recent_stories %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ story.title|truncatechars:50 }}</h6>
+                                <p class="card-text text-muted small">{{ story.prompt|truncatechars:80 }}</p>
+                                <p class="card-text"><small class="text-muted">{{ story.created_at|timesince }} ago</small></p>
+                                <a href="{% url 'stories:story_detail' story.id %}" class="btn btn-sm btn-outline-primary">View Story</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#storyForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        const prompt = $('#prompt').val().trim();
+        if (!prompt) {
+            alert('Please enter a story prompt');
+            return;
+        }
+        
+        // Disable form and show progress
+        $('#generateBtn').prop('disabled', true).text('Generating...');
+        $('#progressSection').show();
+        $('#errorSection').hide();
+        
+        // Send AJAX request
+        $.ajax({
+            url: '{% url "stories:generate_story" %}',
+            method: 'POST',
+            data: JSON.stringify({prompt: prompt}),
+            contentType: 'application/json',
+            success: function(response) {
+                if (response.success) {
+                    // Start polling for status
+                    pollGenerationStatus(response.session_id);
+                } else {
+                    showError(response.error || 'Unknown error occurred');
+                }
+            },
+            error: function(xhr) {
+                const error = xhr.responseJSON?.error || 'Network error occurred';
+                showError(error);
+            }
+        });
+    });
+    
+    function pollGenerationStatus(sessionId) {
+        const statusInterval = setInterval(function() {
+            $.ajax({
+                url: `/status/${sessionId}/`,
+                method: 'GET',
+                success: function(response) {
+                    updateProgress(response.progress, response.status);
+                    
+                    if (response.status === 'completed') {
+                        clearInterval(statusInterval);
+                        if (response.story_id) {
+                            window.location.href = `/story/${response.story_id}/`;
+                        }
+                    } else if (response.status === 'failed') {
+                        clearInterval(statusInterval);
+                        showError(response.error || 'Generation failed');
+                    }
+                },
+                error: function() {
+                    clearInterval(statusInterval);
+                    showError('Error checking generation status');
+                }
+            });
+        }, 2000); // Poll every 2 seconds
+    }
+    
+    function updateProgress(percentage, status) {
+        $('#progressBar').css('width', percentage + '%').attr('aria-valuenow', percentage).text(percentage + '%');
+        
+        const statusMessages = {
+            'pending': 'Initializing...',
+            'generating_story': 'Creating your story...',
+            'generating_images': 'Generating images...',
+            'merging_images': 'Merging images...',
+            'completed': 'Completed!'
+        };
+        
+        $('#statusText').text(statusMessages[status] || status);
+    }
+    
+    function showError(message) {
+        $('#generateBtn').prop('disabled', false).text('✨ Generate Story & Images');
+        $('#progressSection').hide();
+        $('#errorText').text(message);
+        $('#errorSection').show();
+    }
+});
+</script>
+{% endblock %}

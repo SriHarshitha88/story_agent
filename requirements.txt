@@ -1,0 +1,16 @@
+Django
+langchain
+langchain-community
+langchain-ollama
+langchain-core
+ollama
+diffusers
+transformers
+torch
+torchvision
+accelerate
+Pillow
+opencv-python
+numpy
+requests
+python-decouple
